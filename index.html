@@ -237,10 +237,24 @@ footer{
   <h2>Martingale margin preview</h2>
   <p>
     See what your margin would look like if the algorithm opens the
-    next trade in the sequence. Make sure you have equity and margin values input before using this.
+    <strong>next trade</strong> in the sequence.
   </p>
 
-  <label>Do you use full Auto Lot Size?</label>
+  <label>Trading Pair</label>
+  <select id="pair" class="input">
+    <option value="EURUSD">EURUSD</option>
+    <option value="AUDUSD">AUDUSD</option>
+    <option value="NZDUSD">NZDUSD</option>
+    <option value="NZDCAD">NZDCAD</option>
+    <option value="NZDCHF">NZDCHF</option>
+    <option value="EURCHF">EURCHF</option>
+    <option value="CADCHF">CADCHF</option>
+    <option value="EURCAD">EURCAD</option>
+    <option value="EURNZD">EURNZD</option>
+    <option value="USDCAD">USDCAD</option>
+  </select>
+
+  <label>Full Auto Lot Size?</label>
   <select id="useAutoLot" class="input">
     <option value="yes" selected>Yes</option>
     <option value="no">No</option>
@@ -264,6 +278,7 @@ footer{
     </div>
     <p class="explain" id="nextExplain"></p>
   </div>
+
 
 
 </div>
@@ -401,6 +416,7 @@ function simulateNextTrade(){
   const e = num(equity.value);
   const u = num(usedMargin.value);
   const count = +document.getElementById("tradeCount").value;
+  const pair = document.getElementById("pair").value;
 
   if(!(e > 0 && u > 0 && count >= 0)) return;
 
@@ -413,12 +429,10 @@ function simulateNextTrade(){
 
   if(!(baseLot > 0)) return;
 
-  // --- Martingale calculation (your exact formula)
-  const multiplier = pairMultipliers["EURUSD"]; // default / internal
+  const multiplier = pairMultipliers[pair];
   const nextLot = baseLot * Math.pow(multiplier, count);
 
-  // --- Margin math
-  const marginPerLot = 1000; 
+  const marginPerLot = 1000;
   const addedMargin = nextLot * marginPerLot;
   const newUsedMargin = u + addedMargin;
   const newMarginLevel = (e / newUsedMargin) * 100;
@@ -437,8 +451,9 @@ function simulateNextTrade(){
     "Red zone";
 
   nextExplain.textContent =
-    `Base lot: ${baseLot.toFixed(2)} | Next lot: ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)}`;
+    `Pair: ${pair} | Base lot: ${baseLot.toFixed(2)} | Next lot: ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)}`;
 }
+
 </script>
 
 </body>
