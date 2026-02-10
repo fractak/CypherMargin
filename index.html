@@ -131,6 +131,16 @@ input{
   font-size:15px;
 }
 
+select.input{
+  width:100%;
+  padding:11px 12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#020617;
+  color:var(--text);
+  font-size:15px;
+}
+
 button{
   width:100%;
   margin-top:14px;
@@ -187,6 +197,14 @@ footer{
     </p>
   </div>
 </div>
+<div class="card" style="margin-bottom:16px">
+  <div class="sectionTitle">What is Margin?</div>
+
+  <p class="explain">
+    You can think of margin like a safety cushion. When you trade, you are borrowing power from the broker to make bigger trades with less money. Margin shows how much safety space you still have while those trades are open. Margin level is just a number that tells you how big your cushion is. A higher number means more safety, but that doesn't mean having a low number is bad.
+  </p>
+</div>
+
 
 <div class="grid">
 
@@ -201,12 +219,12 @@ footer{
 
   <div class="zone">
     <h3><span class="dot yellow"></span> Yellow Zone (100% to 499%)</h3>
-    <p>Decision zone. Here is when you can choose to intervene, but you do not have to. You may choose to stop new trades, add funds, close some trades, or simply do nothing and allow stop loss. Again, none of this is necessary and if you choose to do nothing, the algorithm will continue to follow its predefined risk rules.</p>
+    <p>Decision zone. You can choose to intervene, but you do not have to. You may choose to stop new trades, add funds, close some trades, or simply do nothing and allow stop loss. If you choose to do nothing, the algorithm will continue to follow its predefined risk rules.</p>
   </div>
 
   <div class="zone">
     <h3><span class="dot red"></span> Red Zone (less than 100%)</h3>
-    <p>Emergency zone. Here Broker force-closures and hitting stop loss become more likely. Stop new trades immediately. Then either add funds, reduce exposure, or allow stop loss / broker actions.</p>
+    <p>Emergency zone. Stop new trades immediately. Then either add funds, reduce exposure, or allow stop loss / broker actions.</p>
   </div>
 
   <p class="explain">
@@ -215,26 +233,39 @@ footer{
 
   <div class="hr"></div>
 
-  <div class="sectionTitle">Worst-Case Simulator</div>
-  <h2>Leverage drawdown preview</h2>
-  <p>If price moved against your open exposure by X%, this is approximately how much equity you would have left.</p>
+  <div class="sectionTitle">Next Trade Simulator</div>
+  <h2>Martingale margin preview</h2>
+  <p>
+    See what your margin would look like if the algorithm opens the
+    next trade in the sequence.
+  </p>
 
-  <label>Account Leverage (×)</label>
-  <input id="leverage" type="number" value="10">
+  <label>Do you use full Auto Lot Size?</label>
+  <select id="useAutoLot" class="input">
+    <option value="yes" selected>Yes</option>
+    <option value="no">No</option>
+  </select>
 
-  <label>Adverse Move (%)</label>
-  <input id="adverseMove" type="number" value="5">
-
-  <button onclick="simulate()">Simulate Drawdown</button>
-
-  <div id="simResult" class="result" style="display:none">
-    <div class="big" id="simEquity">$—</div>
-    <div class="status">
-      <span class="dot" id="simDot"></span>
-      <span id="simLabel"></span>
-    </div>
-    <p class="explain" id="simExplain"></p>
+  <div id="manualLotWrap" style="display:none">
+    <label>Initial Lot Size</label>
+    <input id="baseLot" type="number" step="0.01" placeholder="0.01">
   </div>
+
+  <label>Current Open Trades</label>
+  <input id="tradeCount" type="number" placeholder="5">
+
+  <button onclick="simulateNextTrade()">Simulate Next Trade</button>
+
+  <div id="nextTradeResult" class="result" style="display:none">
+    <div class="big" id="nextMargin">—</div>
+    <div class="status">
+      <span class="dot" id="nextDot"></span>
+      <span id="nextLabel"></span>
+    </div>
+    <p class="explain" id="nextExplain"></p>
+  </div>
+
+
 </div>
 
 <!-- RIGHT -->
@@ -335,6 +366,78 @@ function simulate(){
   simDot.className="dot "+(m>=500?"green":m>=100?"yellow":"red");
   simLabel.textContent=m>=500?"Green":m>=100?"Yellow":"Red";
   simExplain.textContent=`Projected margin: ${Math.round(m)}%.`;
+}
+
+const pairMultipliers = {
+  EURUSD: 1.6,
+  AUDUSD: 1.6,
+  NZDUSD: 1.6,
+  NZDCAD: 1.8,
+  NZDCHF: 1.3,
+  EURCHF: 1.8,
+  CADCHF: 1.6,
+  EURCAD: 1.7,
+  EURNZD: 1.4,
+  USDCAD: 1.8
+};
+
+// --- Auto / Manual lot toggle UI
+const useAutoLotEl = document.getElementById("useAutoLot");
+const manualLotWrap = document.getElementById("manualLotWrap");
+
+function syncLotModeUI(){
+  manualLotWrap.style.display =
+    useAutoLotEl.value === "no" ? "block" : "none";
+}
+useAutoLotEl.addEventListener("change", syncLotModeUI);
+syncLotModeUI();
+
+function computeAutoBaseLot(equityUsd){
+  // Example rule: 0.01 lot per $1,000 equity
+  return (equityUsd / 1000) * 0.01;
+}
+
+function simulateNextTrade(){
+  const e = num(equity.value);
+  const u = num(usedMargin.value);
+  const count = +document.getElementById("tradeCount").value;
+
+  if(!(e > 0 && u > 0 && count >= 0)) return;
+
+  const isAuto = useAutoLotEl.value === "yes";
+  const manualBaseLot = +document.getElementById("baseLot")?.value;
+
+  const baseLot = isAuto
+    ? computeAutoBaseLot(e)
+    : manualBaseLot;
+
+  if(!(baseLot > 0)) return;
+
+  // --- Martingale calculation (your exact formula)
+  const multiplier = pairMultipliers["EURUSD"]; // default / internal
+  const nextLot = baseLot * Math.pow(multiplier, count);
+
+  // --- Margin math
+  const marginPerLot = 1000; 
+  const addedMargin = nextLot * marginPerLot;
+  const newUsedMargin = u + addedMargin;
+  const newMarginLevel = (e / newUsedMargin) * 100;
+
+  nextTradeResult.style.display = "block";
+  nextMargin.textContent = Math.round(newMarginLevel) + "%";
+
+  nextDot.className =
+    "dot " +
+    (newMarginLevel >= 500 ? "green" :
+     newMarginLevel >= 100 ? "yellow" : "red");
+
+  nextLabel.textContent =
+    newMarginLevel >= 500 ? "Green zone" :
+    newMarginLevel >= 100 ? "Yellow zone" :
+    "Red zone";
+
+  nextExplain.textContent =
+    `Base lot: ${baseLot.toFixed(2)} | Next lot: ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)}`;
 }
 </script>
 
