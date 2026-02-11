@@ -183,6 +183,22 @@ footer{
   color:var(--muted);
   font-size:12.5px;
 }
+
+.ladderRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 0;
+  font-size:14px;
+}
+
+.ladderZone{
+  font-weight:800;
+}
+
+.neutral{
+  background:var(--line);
+}
 </style>
 </head>
 
@@ -236,7 +252,7 @@ footer{
   <div class="sectionTitle">Next Trade Simulator</div>
 <h2>Martingale margin preview</h2>
 <p>
-  See what your margin would look like if the algorithm opens the next trade in the sequence. Make sure you have equity and margin values input in the margin calculation section before using this.
+  See what your margin would look like if the algorithm opens the next trade in the sequence. 
 </p>
 
 <label>Trading Pair</label>
@@ -263,17 +279,19 @@ footer{
 </select>
 
 <label>Current Open Trades</label>
-<input id="tradeCount" type="number" placeholder="4">
+<input id="tradeCount" type="number" placeholder="4" min="0" step="1">
 
 <button onclick="simulateNextTrade()">Simulate Next Trade</button>
 
-<div id="nextTradeResult" class="result" style="display:none">
-  <div class="big" id="nextMargin">—</div>
+<div id="nextTradeResult" class="result">
+  <div class="big" id="nextMargin">0%</div>
   <div class="status">
     <span class="dot" id="nextDot"></span>
-    <span id="nextLabel"></span>
+    <span id="nextLabel">Awaiting input</span>
   </div>
-  <p class="explain" id="nextExplain"></p>
+  <p class="explain" id="nextExplain">
+    Enter balance and trade count to preview the next trade.
+  </p>
 </div>
 
 
@@ -293,13 +311,16 @@ footer{
   <input id="usedMargin" type="text" placeholder="2,500">
 
   <!-- LIVE RESULT DIRECTLY BELOW INPUTS -->
-  <div id="result" class="result" style="display:none">
-    <div class="big" id="marginOutput">—</div>
+  <div id="result" class="result">
+    <div class="big" id="marginOutput">0%</div>
     <div class="status">
       <span class="dot" id="statusDot"></span>
-      <span id="statusLabel"></span>
+      <span id="statusLabel">Awaiting input</span>
     </div>
-    <p class="explain" id="statusExplain"></p>
+    <p class="explain" id="statusExplain">
+      Enter equity and used margin to calculate margin level.
+</p>
+
   </div>
 
   <div class="hr"></div>
@@ -312,10 +333,41 @@ footer{
 
   <button onclick="calculateTopUp()">Calculate Deposit</button>
 
-  <div id="topupResult" class="result" style="display:none">
-    <div class="big" id="topupAmount">$—</div>
-    <p class="explain" id="topupExplain"></p>
+  <div id="topupResult" class="result">
+    <div class="big" id="topupAmount">$0</div>
+    <p class="explain" id="topupExplain">
+      Enter a target margin level to calculate required deposit.
+    </p>
   </div>
+
+  <div class="hr"></div>
+
+  <div class="sectionTitle">Forward Risk Projection</div>
+  <h2>Next 5 Trade Outlook</h2>
+  <p class="explain"> These will be the margin values if the algorithm decides to open the next 5 trades in your chosen trading pair. </p>
+
+  <div id="ladderContainer" class="result">
+    <div id="ladderList">
+      <div class="ladderRow">
+        <span>Trade —</span>
+        <span class="ladderZone" style="color:var(--muted)">
+          0% (Awaiting input)
+        </span>
+      </div>
+    </div>
+
+
+    <div style="margin-top:14px">
+      <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:rgba(154,170,199,.9); margin-bottom:6px;">
+        Next Trade Margin Bar
+      </div>
+      <div style="height:14px; border-radius:10px; background:#0B1220; border:1px solid var(--line); overflow:hidden;">
+        <div id="marginBarFill" style="height:100%; width:0%; background:var(--line); transition:all .4s ease;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
 
   <footer>
     Educational tool only. Broker margin and liquidation rules vary.
@@ -334,7 +386,15 @@ function num(v){return Number(String(v).replace(/,/g,""))}
 function calculate(){
   const e=num(equity.value);
   const u=num(usedMargin.value);
-  if(!(e>0&&u>0)){result.style.display="none";return;}
+  if(!(e > 0 && u > 0)){
+    marginOutput.textContent = "0%";
+    statusDot.className = "dot neutral";
+    statusLabel.textContent = "Awaiting input";
+    statusExplain.textContent =
+      "Enter equity and used margin to calculate margin level.";
+    return;
+  }
+
 
   const m=(e/u)*100;
   result.style.display="block";
@@ -351,11 +411,35 @@ function calculate(){
 equity.addEventListener("input",calculate);
 usedMargin.addEventListener("input",calculate);
 
+const tradeCountEl = document.getElementById("tradeCount");
+
+tradeCountEl.addEventListener("input", function () {
+  // Remove anything that is not a digit
+  this.value = this.value.replace(/[^0-9]/g, "");
+
+  // Prevent leading zeros like 0004
+  if (this.value.length > 1) {
+    this.value = this.value.replace(/^0+/, "");
+  }
+
+  // If empty, default to 0
+  if (this.value === "") {
+    this.value = "0";
+  }
+});
+
+
 function calculateTopUp(){
   const e=num(equity.value);
   const u=num(usedMargin.value);
   const t=+targetMargin.value;
-  if(!(e&&u&&t))return;
+  if(!(e > 0 && u > 0 && t > 0)){
+    topupAmount.textContent = "$0";
+    topupExplain.textContent =
+      "Enter equity, used margin, and target margin level.";
+    return;
+  }
+
   const need=Math.max(0,u*(t/100)-e);
   topupResult.style.display="block";
   topupAmount.textContent="$"+Math.round(need);
@@ -411,57 +495,127 @@ function computeAutoBaseLot(equityUsd){
 }
 
 function simulateNextTrade(){
-  const e = num(equity.value);         // existing equity field
-  const u = num(usedMargin.value);     // existing used margin field
   const balance = num(document.getElementById("balance").value);
-  const count = +document.getElementById("tradeCount").value;
+  let count = parseInt(tradeCountEl.value, 10) || 0;
   const pair = document.getElementById("pair").value;
   const profile = document.getElementById("riskProfile").value;
 
-  if(!(e > 0 && u >= 0 && balance > 0 && count >= 0)) return;
+  if(!(balance > 0 && count >= 0)){
+    
+    // LEFT box reset
+    nextMargin.textContent = "0%";
+    nextDot.className = "dot neutral";
+    nextLabel.textContent = "Awaiting input";
+    nextExplain.textContent = "Enter balance and trade count to preview the next trade.";
 
-  // --- Determine base lot from risk profile
-  let divisor;
+    // RIGHT ladder reset
+    ladderList.innerHTML = `
+      <div class="ladderRow">
+        <span>Trade —</span>
+        <span class="ladderZone" style="color:var(--muted)">
+          0% (Awaiting input)
+        </span>
+      </div>
+    `;
 
-  if(profile === "institutional"){
-    divisor = 8000;
-  } else {
-    divisor = 4500;
+    const bar = document.getElementById("marginBarFill");
+    bar.style.width = "0%";
+    bar.style.background = "var(--line)";
+
+    return;
   }
+
+  let divisor = profile === "institutional" ? 8000 : 4500;
 
   const lotSteps = Math.floor(balance / divisor);
   const baseLot = lotSteps * 0.01;
-
   if(baseLot <= 0) return;
 
-  // --- Martingale calculation
   const multiplier = pairMultipliers[pair];
-  const nextLotRaw = baseLot * Math.pow(multiplier, count);
-
-  // round DOWN to 2 decimals (realistic broker behavior)
-  const nextLot = Math.floor(nextLotRaw * 100) / 100;
-
   const marginPerLot = 1000;
-  const addedMargin = nextLot * marginPerLot;
-  const newUsedMargin = u + addedMargin;
-  const newMarginLevel = (e / newUsedMargin) * 100;
 
-  nextTradeResult.style.display = "block";
-  nextMargin.textContent = Math.round(newMarginLevel) + "%";
+  // --- Calculate current used margin
+  let totalUsedMargin = 0;
+  for(let i = 0; i < count; i++){
+    const lotRaw = baseLot * Math.pow(multiplier, i);
+    const lot = Math.floor(lotRaw * 100) / 100;
+    totalUsedMargin += lot * marginPerLot;
+  }
+
+  // === NEXT TRADE (for old calculator display) ===
+  const nextLotRaw = baseLot * Math.pow(multiplier, count);
+  const nextLot = Math.floor(nextLotRaw * 100) / 100;
+  const addedMargin = nextLot * marginPerLot;
+
+  const newUsedMargin = totalUsedMargin + addedMargin;
+  const nextMarginLevel = (balance / newUsedMargin) * 100;
+
+  // ---- UPDATE OLD NEXT TRADE RESULT BOX (LEFT SIDE)
+  nextMargin.textContent = Math.round(nextMarginLevel) + "%";
 
   nextDot.className =
     "dot " +
-    (newMarginLevel >= 500 ? "green" :
-     newMarginLevel >= 100 ? "yellow" : "red");
+    (nextMarginLevel >= 500 ? "green" :
+     nextMarginLevel >= 100 ? "yellow" : "red");
 
   nextLabel.textContent =
-    newMarginLevel >= 500 ? "Green zone" :
-    newMarginLevel >= 100 ? "Yellow zone" :
+    nextMarginLevel >= 500 ? "Green zone" :
+    nextMarginLevel >= 100 ? "Yellow zone" :
     "Red zone";
 
   nextExplain.textContent =
     `Risk: ${profile} | Base lot: ${baseLot.toFixed(2)} | Next lot: ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)}`;
+
+  // === FORWARD RISK PROJECTION (RIGHT SIDE) ===
+
+  let ladderHTML = "";
+  let runningMargin = totalUsedMargin;
+
+  for(let i = 0; i < 5; i++){
+    const lotRaw = baseLot * Math.pow(multiplier, count + i);
+    const lot = Math.floor(lotRaw * 100) / 100;
+
+    const tradeMargin = lot * marginPerLot;
+    runningMargin += tradeMargin;
+
+    const marginLevel = (balance / runningMargin) * 100;
+
+    const zone =
+      marginLevel >= 500 ? "Green" :
+      marginLevel >= 100 ? "Yellow" :
+      "Red";
+
+    const color =
+      marginLevel >= 500 ? "var(--good)" :
+      marginLevel >= 100 ? "var(--warn)" :
+      "var(--bad)";
+
+    ladderHTML += `
+      <div class="ladderRow">
+        <span>Trade ${count + i + 1}</span>
+        <span class="ladderZone" style="color:${color}">
+          ${Math.round(marginLevel)}% (${zone})
+        </span>
+      </div>
+    `;
+  }
+
+  ladderList.innerHTML = ladderHTML;
+
+  // --- Margin Bar (based on NEXT trade only)
+  const bar = document.getElementById("marginBarFill");
+  const capped = Math.min(nextMarginLevel, 600);
+  const widthPercent = Math.min((capped / 600) * 100, 100);
+
+  bar.style.width = widthPercent + "%";
+  bar.style.background =
+    nextMarginLevel >= 500 ? "var(--good)" :
+    nextMarginLevel >= 100 ? "var(--warn)" :
+    "var(--bad)";
 }
+
+
+
 
 </script>
 
