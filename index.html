@@ -234,50 +234,48 @@ footer{
   <div class="hr"></div>
 
   <div class="sectionTitle">Next Trade Simulator</div>
-  <h2>Martingale margin preview</h2>
-  <p>
-    See what your margin would look like if the algorithm opens the
-    next trade in the sequence. Make sure you have equity and margin values input before using this.
-  </p>
+<h2>Martingale margin preview</h2>
+<p>
+  See what your margin would look like if the algorithm opens the next trade in the sequence. Make sure you have equity and margin values input in the margin calculation section before using this.
+</p>
 
-  <label>Trading Pair</label>
-  <select id="pair" class="input">
-    <option value="EURUSD">EURUSD</option>
-    <option value="AUDUSD">AUDUSD</option>
-    <option value="NZDUSD">NZDUSD</option>
-    <option value="NZDCAD">NZDCAD</option>
-    <option value="NZDCHF">NZDCHF</option>
-    <option value="EURCHF">EURCHF</option>
-    <option value="CADCHF">CADCHF</option>
-    <option value="EURCAD">EURCAD</option>
-    <option value="EURNZD">EURNZD</option>
-    <option value="USDCAD">USDCAD</option>
-  </select>
+<label>Trading Pair</label>
+<select id="pair" class="input">
+  <option value="EURUSD">EURUSD</option>
+  <option value="AUDUSD">AUDUSD</option>
+  <option value="NZDUSD">NZDUSD</option>
+  <option value="NZDCAD">NZDCAD</option>
+  <option value="NZDCHF">NZDCHF</option>
+  <option value="EURCHF">EURCHF</option>
+  <option value="CADCHF">CADCHF</option>
+  <option value="EURCAD">EURCAD</option>
+  <option value="EURNZD">EURNZD</option>
+  <option value="USDCAD">USDCAD</option>
+</select>
 
-  <label>Full Auto Lot Size?</label>
-  <select id="useAutoLot" class="input">
-    <option value="yes" selected>Yes</option>
-    <option value="no">No</option>
-  </select>
+<label>Account Balance (USD)</label>
+<input id="balance" type="text" placeholder="30,000">
 
-  <div id="manualLotWrap" style="display:none">
-    <label>Initial Lot Size</label>
-    <input id="baseLot" type="number" step="0.01" placeholder="0.01">
+<label>Risk Profile</label>
+<select id="riskProfile" class="input">
+  <option value="institutional">Institutional</option>
+  <option value="moderate">Moderate</option>
+</select>
+
+<label>Current Open Trades</label>
+<input id="tradeCount" type="number" placeholder="4">
+
+<button onclick="simulateNextTrade()">Simulate Next Trade</button>
+
+<div id="nextTradeResult" class="result" style="display:none">
+  <div class="big" id="nextMargin">—</div>
+  <div class="status">
+    <span class="dot" id="nextDot"></span>
+    <span id="nextLabel"></span>
   </div>
+  <p class="explain" id="nextExplain"></p>
+</div>
 
-  <label>Current Open Trades</label>
-  <input id="tradeCount" type="number" placeholder="5">
-
-  <button onclick="simulateNextTrade()">Simulate Next Trade</button>
-
-  <div id="nextTradeResult" class="result" style="display:none">
-    <div class="big" id="nextMargin">—</div>
-    <div class="status">
-      <span class="dot" id="nextDot"></span>
-      <span id="nextLabel"></span>
-    </div>
-    <p class="explain" id="nextExplain"></p>
-  </div>
 
 
 
@@ -413,24 +411,35 @@ function computeAutoBaseLot(equityUsd){
 }
 
 function simulateNextTrade(){
-  const e = num(equity.value);
-  const u = num(usedMargin.value);
+  const e = num(equity.value);         // existing equity field
+  const u = num(usedMargin.value);     // existing used margin field
+  const balance = num(document.getElementById("balance").value);
   const count = +document.getElementById("tradeCount").value;
   const pair = document.getElementById("pair").value;
+  const profile = document.getElementById("riskProfile").value;
 
-  if(!(e > 0 && u > 0 && count >= 0)) return;
+  if(!(e > 0 && u >= 0 && balance > 0 && count >= 0)) return;
 
-  const isAuto = useAutoLotEl.value === "yes";
-  const manualBaseLot = +document.getElementById("baseLot")?.value;
+  // --- Determine base lot from risk profile
+  let divisor;
 
-  const baseLot = isAuto
-    ? computeAutoBaseLot(e)
-    : manualBaseLot;
+  if(profile === "institutional"){
+    divisor = 8000;
+  } else {
+    divisor = 4500;
+  }
 
-  if(!(baseLot > 0)) return;
+  const lotSteps = Math.floor(balance / divisor);
+  const baseLot = lotSteps * 0.01;
 
+  if(baseLot <= 0) return;
+
+  // --- Martingale calculation
   const multiplier = pairMultipliers[pair];
-  const nextLot = baseLot * Math.pow(multiplier, count);
+  const nextLotRaw = baseLot * Math.pow(multiplier, count);
+
+  // round DOWN to 2 decimals (realistic broker behavior)
+  const nextLot = Math.floor(nextLotRaw * 100) / 100;
 
   const marginPerLot = 1000;
   const addedMargin = nextLot * marginPerLot;
@@ -451,7 +460,7 @@ function simulateNextTrade(){
     "Red zone";
 
   nextExplain.textContent =
-    `Pair: ${pair} | Base lot: ${baseLot.toFixed(2)} | Next lot: ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)}`;
+    `Risk: ${profile} | Base lot: ${baseLot.toFixed(2)} | Next lot: ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)}`;
 }
 
 </script>
