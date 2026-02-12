@@ -255,8 +255,8 @@ footer{
   See what your margin would look like if the algorithm opens the next trade in the sequence. 
 </p>
 
-<label>Trading Pair</label>
-<select id="pair" class="input">
+<label>Next Trading Pair</label>
+<select id="nextPair" class="input">
   <option value="EURUSD">EURUSD</option>
   <option value="AUDUSD">AUDUSD</option>
   <option value="NZDUSD">NZDUSD</option>
@@ -270,7 +270,7 @@ footer{
 </select>
 
 <label>Account Balance (USD)</label>
-<input id="balance" type="text" placeholder="30,000">
+<input id="balance" type="text">
 
 <label>Risk Profile</label>
 <select id="riskProfile" class="input">
@@ -278,8 +278,13 @@ footer{
   <option value="moderate">Moderate</option>
 </select>
 
-<label>Current Open Trades</label>
-<input id="tradeCount" type="number" placeholder="4" min="0" step="1">
+<label>Number of Current Open Trades</label>
+<input id="tradeCount" type="number" min="0" step="1">
+
+<div id="openTradesContainer"></div>
+
+
+
 
 <button onclick="simulateNextTrade()">Simulate Next Trade</button>
 
@@ -305,10 +310,10 @@ footer{
   <h2>Margin calculation</h2>
 
   <label>Account Equity (USD)</label>
-  <input id="equity" type="text" placeholder="12,500">
+  <input id="equity" type="text">
 
   <label>Used Margin (USD)</label>
-  <input id="usedMargin" type="text" placeholder="2,500">
+  <input id="usedMargin" type="text">
 
   <!-- LIVE RESULT DIRECTLY BELOW INPUTS -->
   <div id="result" class="result">
@@ -343,8 +348,8 @@ footer{
   <div class="hr"></div>
 
   <div class="sectionTitle">Forward Risk Projection</div>
-  <h2>Next 5 Trade Outlook</h2>
-  <p class="explain"> These will be the margin values if the algorithm decides to open the next 5 trades in your chosen trading pair. </p>
+  <h2>Next 10 Trade Outlook</h2>
+  <p class="explain"> These will be the margin values if the algorithm decides to open the next 10 trades in your chosen trading pair. </p>
 
   <div id="ladderContainer" class="result">
     <div id="ladderList">
@@ -478,6 +483,42 @@ const pairMultipliers = {
   USDCAD: 1.8
 };
 
+const openTradesContainer = document.getElementById("openTradesContainer");
+const tradeCountInput = document.getElementById("tradeCount");
+
+tradeCountInput.addEventListener("input", generateTradeInputs);
+
+function generateTradeInputs() {
+  const count = parseInt(tradeCountInput.value, 10) || 0;
+  openTradesContainer.innerHTML = "";
+
+  for (let i = 0; i < count; i++) {
+    openTradesContainer.innerHTML += `
+      <div class="zone">
+        <label>Trade ${i + 1} Pair</label>
+        <select class="input tradePair">
+          ${getPairOptions()}
+        </select>
+      </div>
+    `;
+  }
+}
+
+function getPairOptions() {
+  return `
+    <option value="EURUSD">EURUSD</option>
+    <option value="AUDUSD">AUDUSD</option>
+    <option value="NZDUSD">NZDUSD</option>
+    <option value="NZDCAD">NZDCAD</option>
+    <option value="NZDCHF">NZDCHF</option>
+    <option value="EURCHF">EURCHF</option>
+    <option value="CADCHF">CADCHF</option>
+    <option value="EURCAD">EURCAD</option>
+    <option value="EURNZD">EURNZD</option>
+    <option value="USDCAD">USDCAD</option>
+  `;
+}
+
 // --- Auto / Manual lot toggle UI
 const useAutoLotEl = document.getElementById("useAutoLot");
 const manualLotWrap = document.getElementById("manualLotWrap");
@@ -495,25 +536,33 @@ function computeAutoBaseLot(equityUsd){
 }
 
 function simulateNextTrade(){
-  const balance = num(document.getElementById("balance").value);
-  let count = parseInt(tradeCountEl.value, 10) || 0;
-  const pair = document.getElementById("pair").value;
-  const profile = document.getElementById("riskProfile").value;
 
-  if(!(balance > 0 && count >= 0)){
-    
-    // LEFT box reset
+  const balance = num(document.getElementById("balance").value);
+  const profile = document.getElementById("riskProfile").value;
+  const nextPair = document.getElementById("nextPair").value;
+
+  if(!(balance > 0)){
+    return;
+  }
+
+  // --- Base lot logic (unchanged from your system)
+  let divisor = profile === "institutional" ? 8000 : 4500;
+  let lotSteps = Math.floor(balance / divisor);
+  let baseLot = lotSteps * 0.01;
+
+  if(baseLot <= 0){
     nextMargin.textContent = "0%";
     nextDot.className = "dot neutral";
-    nextLabel.textContent = "Awaiting input";
-    nextExplain.textContent = "Enter balance and trade count to preview the next trade.";
+    nextLabel.textContent = "Balance too small";
+    nextExplain.textContent =
+      `Minimum required for ${profile} profile: $${divisor}`;
 
-    // RIGHT ladder reset
+    // Also reset ladder + margin bar
     ladderList.innerHTML = `
       <div class="ladderRow">
         <span>Trade —</span>
         <span class="ladderZone" style="color:var(--muted)">
-          0% (Awaiting input)
+          Inactive (Balance too small)
         </span>
       </div>
     `;
@@ -525,32 +574,55 @@ function simulateNextTrade(){
     return;
   }
 
-  let divisor = profile === "institutional" ? 8000 : 4500;
 
-  const lotSteps = Math.floor(balance / divisor);
-  const baseLot = lotSteps * 0.01;
-  if(baseLot <= 0) return;
-
-  const multiplier = pairMultipliers[pair];
   const marginPerLot = 1000;
 
-  // --- Calculate current used margin
-  let totalUsedMargin = 0;
-  for(let i = 0; i < count; i++){
-    const lotRaw = baseLot * Math.pow(multiplier, i);
-    const lot = Math.floor(lotRaw * 100) / 100;
-    totalUsedMargin += lot * marginPerLot;
-  }
+  // =============================
+  // CALCULATE CURRENT USED MARGIN
+  // =============================
 
-  // === NEXT TRADE (for old calculator display) ===
-  const nextLotRaw = baseLot * Math.pow(multiplier, count);
+  const tradePairs = document.querySelectorAll(".tradePair");
+
+  let totalUsedMargin = 0;
+  let pairCounts = {};
+
+  tradePairs.forEach(select => {
+    const pair = select.value;
+
+    if(!pairCounts[pair]) pairCounts[pair] = 0;
+
+    const sequence = pairCounts[pair];
+    const multiplier = pairMultipliers[pair];
+
+    const lotRaw = baseLot * Math.pow(multiplier, sequence);
+    const lot = Math.floor(lotRaw * 100) / 100;
+
+    totalUsedMargin += lot * marginPerLot;
+
+    pairCounts[pair]++;
+  });
+
+  // =============================
+  // CALCULATE NEXT TRADE
+  // =============================
+
+  if(!pairCounts[nextPair]) pairCounts[nextPair] = 0;
+
+  const nextSequence = pairCounts[nextPair];
+  const nextMultiplier = pairMultipliers[nextPair];
+
+  const nextLotRaw = baseLot * Math.pow(nextMultiplier, nextSequence);
   const nextLot = Math.floor(nextLotRaw * 100) / 100;
+
   const addedMargin = nextLot * marginPerLot;
 
   const newUsedMargin = totalUsedMargin + addedMargin;
   const nextMarginLevel = (balance / newUsedMargin) * 100;
 
-  // ---- UPDATE OLD NEXT TRADE RESULT BOX (LEFT SIDE)
+  // =============================
+  // UPDATE LEFT RESULT BOX
+  // =============================
+
   nextMargin.textContent = Math.round(nextMarginLevel) + "%";
 
   nextDot.className =
@@ -564,15 +636,24 @@ function simulateNextTrade(){
     "Red zone";
 
   nextExplain.textContent =
-    `Risk: ${profile} | Base lot: ${baseLot.toFixed(2)} | Next lot: ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)}`;
+    `Risk: ${profile} | Base lot: ${baseLot.toFixed(2)} | Next lot (${nextPair}): ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)}`;
 
-  // === FORWARD RISK PROJECTION (RIGHT SIDE) ===
+  // =============================
+  // FORWARD 10-TRADE PROJECTION
+  // =============================
 
   let ladderHTML = "";
   let runningMargin = totalUsedMargin;
 
-  for(let i = 0; i < 5; i++){
-    const lotRaw = baseLot * Math.pow(multiplier, count + i);
+  // Clone pairCounts so we don’t mutate original
+  let forwardPairCounts = {...pairCounts};
+
+  for(let i = 0; i < 10; i++){
+
+    if(!forwardPairCounts[nextPair]) forwardPairCounts[nextPair] = 0;
+
+    const sequence = forwardPairCounts[nextPair];
+    const lotRaw = baseLot * Math.pow(nextMultiplier, sequence);
     const lot = Math.floor(lotRaw * 100) / 100;
 
     const tradeMargin = lot * marginPerLot;
@@ -592,17 +673,22 @@ function simulateNextTrade(){
 
     ladderHTML += `
       <div class="ladderRow">
-        <span>Trade ${count + i + 1}</span>
+        <span>Trade ${i + 1} (${nextPair})</span>
         <span class="ladderZone" style="color:${color}">
           ${Math.round(marginLevel)}% (${zone})
         </span>
       </div>
     `;
+
+    forwardPairCounts[nextPair]++;
   }
 
   ladderList.innerHTML = ladderHTML;
 
-  // --- Margin Bar (based on NEXT trade only)
+  // =============================
+  // UPDATE MARGIN BAR
+  // =============================
+
   const bar = document.getElementById("marginBarFill");
   const capped = Math.min(nextMarginLevel, 600);
   const widthPercent = Math.min((capped / 600) * 100, 100);
@@ -613,6 +699,7 @@ function simulateNextTrade(){
     nextMarginLevel >= 100 ? "var(--warn)" :
     "var(--bad)";
 }
+
 
 
 
