@@ -319,8 +319,6 @@ footer{
 
 <div id="pairTable"></div>
 
-<button onclick="simulateNextTrade()">Simulate Next Trade</button>
-
 <div id="nextTradeResult" class="result">
   <div class="big" id="nextMargin">0%</div>
   <div class="status">
@@ -559,6 +557,7 @@ function simulateNextTrade(){
 
     pairCounts[pair] = count;
 
+
     for(let i = 0; i < count; i++){
       const multiplier = pairMultipliers[pair];
       const lotRaw = baseLot * Math.pow(multiplier, i);
@@ -698,6 +697,25 @@ pairTable.innerHTML = `
     `).join("")}
   </div>
 `;
+
+// Balance input
+document.getElementById("balance")
+  .addEventListener("input", simulateNextTrade);
+
+// Risk profile dropdown
+document.getElementById("riskProfile")
+  .addEventListener("change", simulateNextTrade);
+
+// Next pair dropdown
+document.getElementById("nextPair")
+  .addEventListener("change", simulateNextTrade);
+
+// Pair trade counters (generated dynamically)
+document.querySelectorAll(".pairCount")
+  .forEach(input => {
+    input.addEventListener("input", simulateNextTrade);
+  });
+
 </script>
 
 </body>
