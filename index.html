@@ -199,6 +199,42 @@ footer{
 .neutral{
   background:var(--line);
 }
+
+.pairGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px 24px;
+}
+
+@media(max-width:600px){
+  .pairGrid{
+    grid-template-columns:1fr;
+  }
+}
+
+.pairItem{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.pairLabel{
+  font-size:15px;
+  font-weight:600;
+  letter-spacing:.03em;
+}
+
+.pairCount{
+  width:90px;
+  padding:10px 14px;
+  border-radius:20px;
+  border:1px solid var(--line);
+  background:#020617;
+  color:var(--text);
+  font-size:18px;
+  text-align:center;
+}
+
 </style>
 </head>
 
@@ -278,13 +314,10 @@ footer{
   <option value="moderate">Moderate</option>
 </select>
 
-<label>Number of Current Open Trades</label>
-<input id="tradeCount" type="number" min="0" step="1">
+<div class="hr"></div>
+<div class="sectionTitle">Current Open Trades</div>
 
-<div id="openTradesContainer"></div>
-
-
-
+<div id="pairTable"></div>
 
 <button onclick="simulateNextTrade()">Simulate Next Trade</button>
 
@@ -298,10 +331,6 @@ footer{
     Enter balance and trade count to preview the next trade.
   </p>
 </div>
-
-
-
-
 </div>
 
 <!-- RIGHT -->
@@ -416,22 +445,6 @@ function calculate(){
 equity.addEventListener("input",calculate);
 usedMargin.addEventListener("input",calculate);
 
-const tradeCountEl = document.getElementById("tradeCount");
-
-tradeCountEl.addEventListener("input", function () {
-  // Remove anything that is not a digit
-  this.value = this.value.replace(/[^0-9]/g, "");
-
-  // Prevent leading zeros like 0004
-  if (this.value.length > 1) {
-    this.value = this.value.replace(/^0+/, "");
-  }
-
-  // If empty, default to 0
-  if (this.value === "") {
-    this.value = "0";
-  }
-});
 
 
 function calculateTopUp(){
@@ -483,52 +496,6 @@ const pairMultipliers = {
   USDCAD: 1.8
 };
 
-const openTradesContainer = document.getElementById("openTradesContainer");
-const tradeCountInput = document.getElementById("tradeCount");
-
-tradeCountInput.addEventListener("input", generateTradeInputs);
-
-function generateTradeInputs() {
-  const count = parseInt(tradeCountInput.value, 10) || 0;
-  openTradesContainer.innerHTML = "";
-
-  for (let i = 0; i < count; i++) {
-    openTradesContainer.innerHTML += `
-      <div class="zone">
-        <label>Trade ${i + 1} Pair</label>
-        <select class="input tradePair">
-          ${getPairOptions()}
-        </select>
-      </div>
-    `;
-  }
-}
-
-function getPairOptions() {
-  return `
-    <option value="EURUSD">EURUSD</option>
-    <option value="AUDUSD">AUDUSD</option>
-    <option value="NZDUSD">NZDUSD</option>
-    <option value="NZDCAD">NZDCAD</option>
-    <option value="NZDCHF">NZDCHF</option>
-    <option value="EURCHF">EURCHF</option>
-    <option value="CADCHF">CADCHF</option>
-    <option value="EURCAD">EURCAD</option>
-    <option value="EURNZD">EURNZD</option>
-    <option value="USDCAD">USDCAD</option>
-  `;
-}
-
-// --- Auto / Manual lot toggle UI
-const useAutoLotEl = document.getElementById("useAutoLot");
-const manualLotWrap = document.getElementById("manualLotWrap");
-
-function syncLotModeUI(){
-  manualLotWrap.style.display =
-    useAutoLotEl.value === "no" ? "block" : "none";
-}
-useAutoLotEl.addEventListener("change", syncLotModeUI);
-syncLotModeUI();
 
 function computeAutoBaseLot(equityUsd){
   // Example rule: 0.01 lot per $1,000 equity
@@ -545,7 +512,7 @@ function simulateNextTrade(){
     return;
   }
 
-  // --- Base lot logic (unchanged from your system)
+  // --- Base lot logic 
   let divisor = profile === "institutional" ? 8000 : 4500;
   let lotSteps = Math.floor(balance / divisor);
   let baseLot = lotSteps * 0.01;
@@ -557,7 +524,7 @@ function simulateNextTrade(){
     nextExplain.textContent =
       `Minimum required for ${profile} profile: $${divisor}`;
 
-    // Also reset ladder + margin bar
+    // Reset ladder + margin bar
     ladderList.innerHTML = `
       <div class="ladderRow">
         <span>Trade —</span>
@@ -581,26 +548,25 @@ function simulateNextTrade(){
   // CALCULATE CURRENT USED MARGIN
   // =============================
 
-  const tradePairs = document.querySelectorAll(".tradePair");
+  const pairInputs = document.querySelectorAll(".pairCount");
 
   let totalUsedMargin = 0;
   let pairCounts = {};
 
-  tradePairs.forEach(select => {
-    const pair = select.value;
+  pairInputs.forEach(input => {
+    const pair = input.dataset.pair;
+    const count = parseInt(input.value) || 0;
 
-    if(!pairCounts[pair]) pairCounts[pair] = 0;
+    pairCounts[pair] = count;
 
-    const sequence = pairCounts[pair];
-    const multiplier = pairMultipliers[pair];
-
-    const lotRaw = baseLot * Math.pow(multiplier, sequence);
-    const lot = Math.floor(lotRaw * 100) / 100;
-
-    totalUsedMargin += lot * marginPerLot;
-
-    pairCounts[pair]++;
+    for(let i = 0; i < count; i++){
+      const multiplier = pairMultipliers[pair];
+      const lotRaw = baseLot * Math.pow(multiplier, i);
+      const lot = Math.floor(lotRaw * 100) / 100;
+      totalUsedMargin += lot * marginPerLot;
+    }
   });
+
 
   // =============================
   // CALCULATE NEXT TRADE
@@ -700,10 +666,38 @@ function simulateNextTrade(){
     "var(--bad)";
 }
 
+const pairs = [
+  "EURUSD",
+  "AUDUSD",
+  "NZDUSD",
+  "NZDCAD",
+  "NZDCHF",
+  "EURCHF",
+  "CADCHF",
+  "EURCAD",
+  "EURNZD",
+  "USDCAD"
+];
 
+const pairTable = document.getElementById("pairTable");
 
-
-
+// Generate table
+pairTable.innerHTML = `
+  <div class="pairGrid">
+    ${pairs.map(pair => `
+      <div class="pairItem">
+        <span class="pairLabel">${pair}</span>
+        <input 
+          type="number" 
+          min="0" 
+          value="0" 
+          class="pairCount"
+          data-pair="${pair}"
+        >
+      </div>
+    `).join("")}
+  </div>
+`;
 </script>
 
 </body>
