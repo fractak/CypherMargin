@@ -585,6 +585,25 @@ function simulateNextTrade(){
   const nextMarginLevel = (balance / newUsedMargin) * 100;
 
   // =============================
+  // TRADES UNTIL 100% MARGIN
+  // =============================
+
+  let collapseCount = 0;
+  let collapseMargin = newUsedMargin;   // start AFTER next trade
+  let collapseSequence = nextSequence + 1; // start AFTER next trade
+
+  while (collapseMargin < balance && collapseCount < 50) {
+    const lotRaw = baseLot * Math.pow(nextMultiplier, collapseSequence);
+    const lot = Math.floor(lotRaw * 100) / 100;
+
+    collapseMargin += lot * marginPerLot;
+
+    collapseSequence++;
+    collapseCount++;
+  }
+
+
+  // =============================
   // UPDATE LEFT RESULT BOX
   // =============================
 
@@ -601,7 +620,8 @@ function simulateNextTrade(){
     "Red zone";
 
   nextExplain.textContent =
-    `Risk: ${profile} | Base lot: ${baseLot.toFixed(2)} | Next lot (${nextPair}): ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)}`;
+  `Risk: ${profile} | Base lot: ${baseLot.toFixed(2)} | Next lot (${nextPair}): ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)} | Estimated additional trades in ${nextPair} to 100%: ${collapseCount}`;
+
 
   // =============================
   // FORWARD 10-TRADE PROJECTION
@@ -649,6 +669,7 @@ function simulateNextTrade(){
   }
 
   ladderList.innerHTML = ladderHTML;
+
 
   // =============================
   // UPDATE MARGIN BAR
