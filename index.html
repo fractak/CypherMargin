@@ -1,594 +1,673 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Margin Level Guide & Calculator</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Margin Level Guide & Calculator</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<style>
-:root{
-  --bg:#0A0D14;
-  --card:#111827;
+  <style>
+    :root{
+      --bg:#0A0D14;
+      --card:#111827;
 
-  --text:#EAF1FF;
-  --muted:#9AAAC7;
+      --text:#EAF1FF;
+      --muted:#9AAAC7;
 
-  --good:#2dd4bf;
-  --warn:#fbbf24;
-  --bad:#fb7185;
+      --good:#2dd4bf;
+      --warn:#fbbf24;
+      --bad:#fb7185;
 
-  --line:rgba(255,255,255,.12);
-  --shadow:0 16px 40px rgba(0,0,0,.6);
-  --radius:18px;
-}
+      --line:rgba(255,255,255,.12);
+      --shadow:0 16px 40px rgba(0,0,0,.6);
+      --radius:18px;
+    }
 
-*{box-sizing:border-box}
-html,body{height:100%}
+    *{box-sizing:border-box}
+    html,body{height:100%}
 
-body{
-  margin:0;
-  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-.wrap{max-width:1100px;margin:auto;padding:26px 18px 64px}
+    .wrap{max-width:1100px;margin:auto;padding:26px 18px 64px}
 
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:14px;
-  margin-bottom:18px;
-}
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      margin-bottom:18px;
+    }
 
-h1{margin:0;font-size:26px}
-.subtitle{margin-top:6px;color:var(--muted);max-width:85ch}
+    h1{margin:0;font-size:26px}
+    .subtitle{margin-top:6px;color:var(--muted);max-width:85ch}
 
-.pill{
-  font-size:12px;
-  padding:8px 12px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:#0F172A;
-}
+    .pill{
+      font-size:12px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#0F172A;
+    }
 
-.grid{
-  display:grid;
-  grid-template-columns:1.05fr .95fr;
-  gap:16px;
-}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
+    .grid{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:16px;
+    }
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
 
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:18px;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
 
-.sectionTitle{
-  font-size:13px;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:rgba(234,241,255,.7);
-  margin-bottom:10px;
-}
+    .sectionTitle{
+      font-size:13px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(234,241,255,.7);
+      margin-bottom:10px;
+    }
 
-h2{margin:0 0 12px;font-size:20px}
+    h2{margin:0 0 12px;font-size:20px}
 
-.zone{
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:12px;
-  border:1px solid var(--line);
-  background:#0B1220;
-}
+    .zone{
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:12px;
+      border:1px solid var(--line);
+      background:#0B1220;
+    }
 
-.zone h3{
-  margin:0 0 6px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:14px;
-}
+    .zone h3{
+      margin:0 0 6px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between; 
+      font-size:14px;
+    }
 
-.dot{width:12px;height:12px;border-radius:50%}
-.green{background:var(--good)}
-.yellow{background:var(--warn)}
-.red{background:var(--bad)}
 
-.zone p{margin:0;color:var(--muted);font-size:14px}
+    .dot{width:12px;height:12px;border-radius:50%}
+    .green{background:var(--good)}
+    .yellow{background:var(--warn)}
+    .red{background:var(--bad)}
 
-.explain{
-  margin-top:10px;
-  color:var(--muted);
-  font-size:13.5px;
-  line-height:1.55;
-}
+    .zone p{margin:0;color:var(--muted);font-size:14px}
 
-label{
-  display:block;
-  font-size:12px;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:rgba(154,170,199,.9);
-  margin:14px 0 7px;
-}
+    .explain{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13.5px;
+      line-height:1.55;
+    }
 
-input{
-  width:100%;
-  padding:11px 12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:#020617;
-  color:var(--text);
-  font-size:15px;
-}
+    label{
+      display:block;
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:rgba(154,170,199,.9);
+      margin:14px 0 7px;
+    }
 
-select.input{
-  width:100%;
-  padding:11px 12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:#020617;
-  color:var(--text);
-  font-size:15px;
-}
+    input{
+      width:100%;
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#020617;
+      color:var(--text);
+      font-size:15px;
+    }
 
-button{
-  width:100%;
-  margin-top:14px;
-  padding:12px 14px;
-  border-radius:16px;
-  border:1px solid var(--line);
-  background:#0F172A;
-  color:var(--text);
-  font-weight:800;
-  cursor:pointer;
-}
-button:hover{background:#111C34}
+    select.input{
+      width:100%;
+      padding:11px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#020617;
+      color:var(--text);
+      font-size:15px;
+    }
 
-.result{
-  margin-top:12px;
-  padding:14px;
-  border-radius:16px;
-  border:1px solid var(--line);
-  background:#020617;
-}
+    button{
+      width:100%;
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#0F172A;
+      color:var(--text);
+      font-weight:800;
+      cursor:pointer;
+    }
+    button:hover{background:#111C34}
 
-.big{font-size:34px;font-weight:900}
+    .result{
+      margin-top:12px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#020617;
+    }
 
-.status{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-top:8px;
-  font-weight:900;
-}
+    .big{font-size:34px;font-weight:900}
 
-.hr{
-  height:1px;
-  margin:16px 0;
-  background:var(--line);
-}
+    .status{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:8px;
+      font-weight:900;
+    }
 
-footer{
-  margin-top:18px;
-  color:var(--muted);
-  font-size:12.5px;
-}
+    .hr{
+      height:1px;
+      margin:16px 0;
+      background:var(--line);
+    }
 
-.ladderRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:6px 0;
-  font-size:14px;
-}
+    footer{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:12.5px;
+    }
 
-.ladderZone{
-  font-weight:800;
-}
+    .ladderRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:6px 0;
+      font-size:14px;
+    }
 
-.neutral{
-  background:var(--line);
-}
+    .ladderZone{
+      font-weight:800;
+    }
 
-.pairGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px 24px;
-}
+    .neutral{
+      background:var(--line);
+    }
 
-@media(max-width:600px){
-  .pairGrid{
-    grid-template-columns:1fr;
-  }
-}
+    .pairGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px 24px;
+    }
 
-.pairItem{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
+    @media(max-width:600px){
+      .pairGrid{
+        grid-template-columns:1fr;
+      }
+    }
 
-.pairLabel{
-  font-size:15px;
-  font-weight:600;
-  letter-spacing:.03em;
-}
+    .pairItem{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
 
-.pairCount{
-  width:90px;
-  padding:10px 14px;
-  border-radius:20px;
-  border:1px solid var(--line);
-  background:#020617;
-  color:var(--text);
-  font-size:18px;
-  text-align:center;
-}
+    .pairLabel{
+      font-size:15px;
+      font-weight:600;
+      letter-spacing:.03em;
+    }
 
-</style>
+    .pairCount{
+      width:90px;
+      padding:10px 14px;
+      border-radius:20px;
+      border:1px solid var(--line);
+      background:#020617;
+      color:var(--text);
+      font-size:18px;
+      text-align:center;
+    }
+
+    .helpToggle {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:20px;
+      height:20px;
+      border-radius:50%;
+      background:#1f2937;
+      color:white;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      border:1px solid var(--line);
+    }
+
+    .helpContent {
+      max-height:0;
+      overflow:hidden;
+      transition:max-height .35s ease, opacity .25s ease;
+      opacity:0;
+      margin-top:8px;
+    }
+
+    .helpContent.open {
+      max-height:500px;
+      opacity:1;
+    }
+
+  </style>
 </head>
 
 <body>
-<div class="wrap">
+  <div class="wrap">
 
-<div class="topbar">
-  <div>
-    <h1>Margin Level Guide</h1>
-    <p class="subtitle">
-      As the algorithm opens trades, margin will fall. This is normal. What matters is which zone your margin is in and what (if anything) you should do.
-    </p>
-  </div>
-</div>
-<div class="card" style="margin-bottom:16px">
-  <div class="sectionTitle">What is Margin?</div>
-
-  <p class="explain">
-    You can think of margin like a safety cushion. When you trade, you are borrowing power from the broker to make bigger trades with less money. Margin shows how much safety space you still have while those trades are open. Margin level is just a number that tells you how big your cushion is. A higher number means more safety, but that doesn't mean having a low number is bad.
-  </p>
-</div>
-
-
-<div class="grid">
-
-<!-- LEFT -->
-<div class="card">
-  <div class="sectionTitle">Understanding Zones</div>
-
-  <div class="zone">
-    <h3><span class="dot green"></span> Green Zone (500% or higher)</h3>
-    <p>Normal operation. margin is being used as designed. Please do not intervene. Large drops here are expected and temporary.</p>
-  </div>
-
-  <div class="zone">
-    <h3><span class="dot yellow"></span> Yellow Zone (100% to 499%)</h3>
-    <p>Decision zone. You can choose to intervene, but you do not have to. You may choose to stop new trades, add funds, close some trades, or simply do nothing and allow stop loss. If you choose to do nothing, the algorithm will continue to follow its predefined risk rules.</p>
-  </div>
-
-  <div class="zone">
-    <h3><span class="dot red"></span> Red Zone (less than 100%)</h3>
-    <p>Emergency zone. Stop new trades immediately. Then either add funds, reduce exposure, or allow stop loss / broker actions.</p>
-  </div>
-
-  <p class="explain">
-    Doing nothing is a valid choice. Inaction means accepting the algorithm’s predefined worst-case outcome.
-  </p>
-
-  <div class="hr"></div>
-
-  <div class="sectionTitle">Next Trade Simulator</div>
-<h2>Martingale margin preview</h2>
-<p>
-  See what your margin would look like if the algorithm opens the next trade in the sequence. 
-</p>
-
-<label>Next Trading Pair</label>
-<select id="nextPair" class="input">
-  <option value="EURUSD">EURUSD</option>
-  <option value="AUDUSD">AUDUSD</option>
-  <option value="NZDUSD">NZDUSD</option>
-  <option value="NZDCAD">NZDCAD</option>
-  <option value="NZDCHF">NZDCHF</option>
-  <option value="EURCHF">EURCHF</option>
-  <option value="CADCHF">CADCHF</option>
-  <option value="EURCAD">EURCAD</option>
-  <option value="EURNZD">EURNZD</option>
-  <option value="USDCAD">USDCAD</option>
-</select>
-
-<label>Account Balance (USD)</label>
-<input id="balance" type="text">
-
-<label>Risk Profile</label>
-<select id="riskProfile" class="input">
-  <option value="institutional">Institutional</option>
-  <option value="moderate">Moderate</option>
-</select>
-
-<div class="hr"></div>
-<div class="sectionTitle">Current Open Trades</div>
-
-<div id="pairTable"></div>
-
-<div id="nextTradeResult" class="result">
-  <div class="big" id="nextMargin">0%</div>
-  <div class="status">
-    <span class="dot" id="nextDot"></span>
-    <span id="nextLabel">Awaiting input</span>
-  </div>
-  <p class="explain" id="nextExplain">
-    Enter balance and trade count to preview the next trade.
-  </p>
-</div>
-</div>
-
-<!-- RIGHT -->
-<div class="card">
-  <div class="sectionTitle">Calculator</div>
-  <h2>Margin calculation</h2>
-
-  <label>Account Equity (USD)</label>
-  <input id="equity" type="text">
-
-  <label>Used Margin (USD)</label>
-  <input id="usedMargin" type="text">
-
-  <!-- LIVE RESULT DIRECTLY BELOW INPUTS -->
-  <div id="result" class="result">
-    <div class="big" id="marginOutput">0%</div>
-    <div class="status">
-      <span class="dot" id="statusDot"></span>
-      <span id="statusLabel">Awaiting input</span>
-    </div>
-    <p class="explain" id="statusExplain">
-      Enter equity and used margin to calculate margin level.
-</p>
-
-  </div>
-
-  <div class="hr"></div>
-
-  <h2>If you choose to add funds</h2> 
-  <p class="explain"> Adding funds increases your margin without changing any trades. This is optional and only one of several valid actions. </p>
-
-  <label>Target Margin Level (%)</label>
-  <input id="targetMargin" type="number" value="500">
-
-  <button onclick="calculateTopUp()">Calculate Deposit</button>
-
-  <div id="topupResult" class="result">
-    <div class="big" id="topupAmount">$0</div>
-    <p class="explain" id="topupExplain">
-      Enter a target margin level to calculate required deposit.
-    </p>
-  </div>
-
-  <div class="hr"></div>
-
-  <div class="sectionTitle">Forward Risk Projection</div>
-  <h2>Next 10 Trade Outlook</h2>
-  <p class="explain"> These will be the margin values if the algorithm decides to open the next 10 trades in your chosen trading pair. </p>
-
-  <div id="ladderContainer" class="result">
-    <div id="ladderList">
-      <div class="ladderRow">
-        <span>Trade —</span>
-        <span class="ladderZone" style="color:var(--muted)">
-          0% (Awaiting input)
-        </span>
+    <div class="topbar">
+      <div>
+        <h1>Margin Level Guide</h1>
+        <p class="subtitle">
+          As the algorithm opens trades, margin will fall. This is normal. What matters is which zone your margin is in and what (if anything) you should do.
+        </p>
       </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="sectionTitle">What is Margin?</div>
+
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span>Click to learn</span>
+        <span class="helpToggle" onclick="toggleHelp('marginHelp')">?</span>
+      </div>
+
+      <div id="marginHelp" class="helpContent">
+        <p class="explain">
+          You can think of margin like a safety cushion. When you trade, you are borrowing power from the broker to make bigger trades with less money. Margin shows how much safety space you still have while those trades are open. Margin level is just a number that tells you how big your cushion is. A higher number means more safety, but that doesn't mean having a low number is bad.
+        </p>
+      </div>
+
     </div>
 
 
-    <div style="margin-top:14px">
-      <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:rgba(154,170,199,.9); margin-bottom:6px;">
-        Next Trade Margin Bar
+    <div class="grid">
+
+      <!-- LEFT -->
+      <div class="card">
+        <div class="sectionTitle">Understanding Zones</div>
+
+        <div class="zone">
+          <h3>
+            <span style="display:flex; align-items:center; gap:10px;">
+              <span class="dot green"></span>
+              Green Zone (500% or higher)
+            </span>
+
+            <span class="helpToggle" onclick="toggleHelp('greenHelp')">?</span>
+          </h3>
+
+
+          <div id="greenHelp" class="helpContent">
+            <p class="explain">
+              Normal operation. Margin is being used as designed. Please do not intervene. Large drops here are expected and temporary.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="zone">
+          <h3>
+            <span style="display:flex; align-items:center; gap:10px;">
+              <span class="dot yellow"></span>
+              Yellow Zone (100% to 499%)
+            </span>
+
+            <span class="helpToggle" onclick="toggleHelp('yellowHelp')">?</span>
+          </h3>
+
+
+          <div id="yellowHelp" class="helpContent">
+            <p class="explain">
+              Decision zone. You can choose to intervene, but you do not have to. You may choose to stop new trades, add funds, close some trades, or simply do nothing and allow stop loss. If you choose to do nothing, the algorithm will continue to follow its predefined risk rules.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="zone">
+          <h3>
+            <span style="display:flex; align-items:center; gap:10px;">
+              <span class="dot red"></span>
+              Red Zone (less than 100%)
+            </span>
+
+            <span class="helpToggle" onclick="toggleHelp('redHelp')">?</span>
+          </h3>
+
+
+          <div id="redHelp" class="helpContent">
+            <p class="explain">
+              Emergency zone. Stop new trades immediately. Then either add funds, reduce exposure, or allow stop loss / broker actions.
+            </p>
+          </div>
+
+        </div>
+
+        <p class="explain">
+          Doing nothing is a valid choice. Inaction means accepting the algorithm’s predefined worst-case outcome.
+        </p>
+
+        <div class="hr"></div>
+
+        <div class="sectionTitle">Next Trade Simulator</div>
+        <h2>Martingale margin preview</h2>
+        <p>
+          See what your margin would look like if the algorithm opens the next trade in the sequence. 
+        </p>
+
+        <label>Next Trading Pair</label>
+        <select id="nextPair" class="input">
+          <option value="EURUSD">EURUSD</option>
+          <option value="AUDUSD">AUDUSD</option>
+          <option value="NZDUSD">NZDUSD</option>
+          <option value="NZDCAD">NZDCAD</option>
+          <option value="NZDCHF">NZDCHF</option>
+          <option value="EURCHF">EURCHF</option>
+          <option value="CADCHF">CADCHF</option>
+          <option value="EURCAD">EURCAD</option>
+          <option value="EURNZD">EURNZD</option>
+          <option value="USDCAD">USDCAD</option>
+        </select>
+
+        <label>Account Balance (USD)</label>
+        <input id="balance" type="text">
+
+        <label>Risk Profile</label>
+        <select id="riskProfile" class="input">
+          <option value="institutional">Institutional</option>
+          <option value="moderate">Moderate</option>
+        </select>
+
+        <div class="hr"></div>
+        <div class="sectionTitle">Current Open Trades</div>
+
+        <div id="pairTable"></div>
+
+        <div id="nextTradeResult" class="result">
+          <div class="big" id="nextMargin">0%</div>
+          <div class="status">
+            <span class="dot" id="nextDot"></span>
+            <span id="nextLabel">Awaiting input</span>
+          </div>
+          <p class="explain" id="nextExplain">
+            Enter balance and trade count to preview the next trade.
+          </p>
+        </div>
       </div>
-      <div style="height:14px; border-radius:10px; background:#0B1220; border:1px solid var(--line); overflow:hidden;">
-        <div id="marginBarFill" style="height:100%; width:0%; background:var(--line); transition:all .4s ease;"></div>
+
+      <!-- RIGHT -->
+      <div class="card">
+        <div class="sectionTitle">Calculator</div>
+        <h2>Margin calculation</h2>
+
+        <label>Account Equity (USD)</label>
+        <input id="equity" type="text">
+
+        <label>Used Margin (USD)</label>
+        <input id="usedMargin" type="text">
+
+        <!-- LIVE RESULT DIRECTLY BELOW INPUTS -->
+        <div id="result" class="result">
+          <div class="big" id="marginOutput">0%</div>
+          <div class="status">
+            <span class="dot" id="statusDot"></span>
+            <span id="statusLabel">Awaiting input</span>
+          </div>
+          <p class="explain" id="statusExplain">
+            Enter equity and used margin to calculate margin level.
+          </p>
+
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>If you choose to add funds</h2> 
+        <p class="explain"> Adding funds increases your margin without changing any trades. This is optional and only one of several valid actions. </p>
+
+        <label>Target Margin Level (%)</label>
+        <input id="targetMargin" type="number" value="500">
+
+        <button onclick="calculateTopUp()">Calculate Deposit</button>
+
+        <div id="topupResult" class="result">
+          <div class="big" id="topupAmount">$0</div>
+          <p class="explain" id="topupExplain">
+            Enter a target margin level to calculate required deposit.
+          </p>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="sectionTitle">Forward Risk Projection</div>
+        <h2>Next 10 Trade Outlook</h2>
+        <p class="explain"> These will be the margin values if the algorithm decides to open the next 10 trades in your chosen trading pair. </p>
+
+        <div id="ladderContainer" class="result">
+          <div id="ladderList">
+            <div class="ladderRow">
+              <span>Trade —</span>
+              <span class="ladderZone" style="color:var(--muted)">
+                0% (Awaiting input)
+              </span>
+            </div>
+          </div>
+
+
+          <div style="margin-top:14px">
+            <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:rgba(154,170,199,.9); margin-bottom:6px;">
+              Next Trade Margin Bar
+            </div>
+            <div style="height:14px; border-radius:10px; background:#0B1220; border:1px solid var(--line); overflow:hidden;">
+              <div id="marginBarFill" style="height:100%; width:0%; background:var(--line); transition:all .4s ease;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <footer>
+          Educational tool only. Broker margin and liquidation rules vary.
+        </footer>
       </div>
+
     </div>
   </div>
 
-  <div class="hr"></div>
+  <script>
+    const equity=document.getElementById("equity");
+    const usedMargin=document.getElementById("usedMargin");
 
-  <footer>
-    Educational tool only. Broker margin and liquidation rules vary.
-  </footer>
-</div>
+    function num(v){return Number(String(v).replace(/,/g,""))}
 
-</div>
-</div>
-
-<script>
-const equity=document.getElementById("equity");
-const usedMargin=document.getElementById("usedMargin");
-
-function num(v){return Number(String(v).replace(/,/g,""))}
-
-function calculate(){
-  const e=num(equity.value);
-  const u=num(usedMargin.value);
-  if(!(e > 0 && u > 0)){
-    marginOutput.textContent = "0%";
-    statusDot.className = "dot neutral";
-    statusLabel.textContent = "Awaiting input";
-    statusExplain.textContent =
-      "Enter equity and used margin to calculate margin level.";
-    return;
-  }
+    function calculate(){
+      const e=num(equity.value);
+      const u=num(usedMargin.value);
+      if(!(e > 0 && u > 0)){
+        marginOutput.textContent = "0%";
+        statusDot.className = "dot neutral";
+        statusLabel.textContent = "Awaiting input";
+        statusExplain.textContent =
+        "Enter equity and used margin to calculate margin level.";
+        return;
+      }
 
 
-  const m=(e/u)*100;
-  result.style.display="block";
-  marginOutput.textContent=Math.round(m)+"%";
+      const m=(e/u)*100;
+      result.style.display="block";
+      marginOutput.textContent=Math.round(m)+"%";
 
-  statusDot.className="dot "+(m>=500?"green":m>=100?"yellow":"red");
-  statusLabel.textContent=m>=500?"Green zone":m>=100?"Yellow zone":"Red zone";
-  statusExplain.textContent=
-    m>=500?"Normal operation.":
-    m>=100?"Decision zone.":
-    "Emergency zone.";
-}
+      statusDot.className="dot "+(m>=500?"green":m>=100?"yellow":"red");
+      statusLabel.textContent=m>=500?"Green zone":m>=100?"Yellow zone":"Red zone";
+      statusExplain.textContent=
+      m>=500?"Normal operation.":
+      m>=100?"Decision zone.":
+      "Emergency zone.";
+    }
 
-equity.addEventListener("input",calculate);
-usedMargin.addEventListener("input",calculate);
+    equity.addEventListener("input",calculate);
+    usedMargin.addEventListener("input",calculate);
 
 
 
-function calculateTopUp(){
-  const e=num(equity.value);
-  const u=num(usedMargin.value);
-  const t=+targetMargin.value;
-  if(!(e > 0 && u > 0 && t > 0)){
-    topupAmount.textContent = "$0";
-    topupExplain.textContent =
-      "Enter equity, used margin, and target margin level.";
-    return;
-  }
+    function calculateTopUp(){
+      const e=num(equity.value);
+      const u=num(usedMargin.value);
+      const t=+targetMargin.value;
+      if(!(e > 0 && u > 0 && t > 0)){
+        topupAmount.textContent = "$0";
+        topupExplain.textContent =
+        "Enter equity, used margin, and target margin level.";
+        return;
+      }
 
-  const need=Math.max(0,u*(t/100)-e);
-  topupResult.style.display="block";
-  topupAmount.textContent="$"+Math.round(need);
-  topupExplain.textContent=need?
-    `Deposit to reach ~${t}%.`:
-    "Current equity already supports this margin.";
-}
+      const need=Math.max(0,u*(t/100)-e);
+      topupResult.style.display="block";
+      topupAmount.textContent="$"+Math.round(need);
+      topupExplain.textContent=need?
+      `Deposit to reach ~${t}%.`:
+      "Current equity already supports this margin.";
+    }
 
-function simulate(){
-  const e=num(equity.value);
-  const u=num(usedMargin.value);
-  const l=+leverage.value;
-  const a=+adverseMove.value;
-  if(!(e&&u))return;
-  const loss=e*l*(a/100);
-  const ne=Math.max(0,e-loss);
-  const m=(ne/u)*100;
+    function simulate(){
+      const e=num(equity.value);
+      const u=num(usedMargin.value);
+      const l=+leverage.value;
+      const a=+adverseMove.value;
+      if(!(e&&u))return;
+      const loss=e*l*(a/100);
+      const ne=Math.max(0,e-loss);
+      const m=(ne/u)*100;
 
-  simResult.style.display="block";
-  simEquity.textContent="$"+Math.round(ne);
-  simDot.className="dot "+(m>=500?"green":m>=100?"yellow":"red");
-  simLabel.textContent=m>=500?"Green":m>=100?"Yellow":"Red";
-  simExplain.textContent=`Projected margin: ${Math.round(m)}%.`;
-}
+      simResult.style.display="block";
+      simEquity.textContent="$"+Math.round(ne);
+      simDot.className="dot "+(m>=500?"green":m>=100?"yellow":"red");
+      simLabel.textContent=m>=500?"Green":m>=100?"Yellow":"Red";
+      simExplain.textContent=`Projected margin: ${Math.round(m)}%.`;
+    }
 
-const pairMultipliers = {
-  EURUSD: 1.6,
-  AUDUSD: 1.6,
-  NZDUSD: 1.6,
-  NZDCAD: 1.8,
-  NZDCHF: 1.3,
-  EURCHF: 1.8,
-  CADCHF: 1.6,
-  EURCAD: 1.7,
-  EURNZD: 1.4,
-  USDCAD: 1.8
-};
+    const pairMultipliers = {
+      EURUSD: 1.6,
+      AUDUSD: 1.6,
+      NZDUSD: 1.6,
+      NZDCAD: 1.8,
+      NZDCHF: 1.3,
+      EURCHF: 1.8,
+      CADCHF: 1.6,
+      EURCAD: 1.7,
+      EURNZD: 1.4,
+      USDCAD: 1.8
+    };
 
 
-function computeAutoBaseLot(equityUsd){
+    function computeAutoBaseLot(equityUsd){
   // Example rule: 0.01 lot per $1,000 equity
-  return (equityUsd / 1000) * 0.01;
-}
+      return (equityUsd / 1000) * 0.01;
+    }
 
-function simulateNextTrade(){
+    function simulateNextTrade(){
 
-  const balance = num(document.getElementById("balance").value);
-  const profile = document.getElementById("riskProfile").value;
-  const nextPair = document.getElementById("nextPair").value;
+      const balance = num(document.getElementById("balance").value);
+      const profile = document.getElementById("riskProfile").value;
+      const nextPair = document.getElementById("nextPair").value;
 
-  if(!(balance > 0)){
-    return;
-  }
+      if(!(balance > 0)){
+        return;
+      }
 
   // --- Base lot logic 
-  let divisor = profile === "institutional" ? 8000 : 4500;
-  let lotSteps = Math.floor(balance / divisor);
-  let baseLot = lotSteps * 0.01;
+      let divisor = profile === "institutional" ? 8000 : 4500;
+      let lotSteps = Math.floor(balance / divisor);
+      let baseLot = lotSteps * 0.01;
 
-  if(baseLot <= 0){
-    nextMargin.textContent = "0%";
-    nextDot.className = "dot neutral";
-    nextLabel.textContent = "Balance too small";
-    nextExplain.textContent =
-      `Minimum required for ${profile} profile: $${divisor}`;
+      if(baseLot <= 0){
+        nextMargin.textContent = "0%";
+        nextDot.className = "dot neutral";
+        nextLabel.textContent = "Balance too small";
+        nextExplain.textContent =
+        `Minimum required for ${profile} profile: $${divisor}`;
 
     // Reset ladder + margin bar
-    ladderList.innerHTML = `
-      <div class="ladderRow">
+        ladderList.innerHTML = `
+        <div class="ladderRow">
         <span>Trade —</span>
         <span class="ladderZone" style="color:var(--muted)">
-          Inactive (Balance too small)
+        Inactive (Balance too small)
         </span>
-      </div>
-    `;
+        </div>
+        `;
 
-    const bar = document.getElementById("marginBarFill");
-    bar.style.width = "0%";
-    bar.style.background = "var(--line)";
+        const bar = document.getElementById("marginBarFill");
+        bar.style.width = "0%";
+        bar.style.background = "var(--line)";
 
-    return;
-  }
+        return;
+      }
 
 
-  const marginPerLot = 1000;
+      const marginPerLot = 1000;
 
   // =============================
   // CALCULATE CURRENT USED MARGIN
   // =============================
 
-  const pairInputs = document.querySelectorAll(".pairCount");
+      const pairInputs = document.querySelectorAll(".pairCount");
 
-  let totalUsedMargin = 0;
-  let pairCounts = {};
+      let totalUsedMargin = 0;
+      let pairCounts = {};
 
-  pairInputs.forEach(input => {
-    const pair = input.dataset.pair;
-    const count = parseInt(input.value) || 0;
+      pairInputs.forEach(input => {
+        const pair = input.dataset.pair;
+        const count = parseInt(input.value) || 0;
 
-    pairCounts[pair] = count;
+        pairCounts[pair] = count;
 
 
-    for(let i = 0; i < count; i++){
-      const multiplier = pairMultipliers[pair];
-      const lotRaw = baseLot * Math.pow(multiplier, i);
-      const lot = Math.floor(lotRaw * 100) / 100;
-      totalUsedMargin += lot * marginPerLot;
-    }
-  });
+        for(let i = 0; i < count; i++){
+          const multiplier = pairMultipliers[pair];
+          const lotRaw = baseLot * Math.pow(multiplier, i);
+          const lot = Math.floor(lotRaw * 100) / 100;
+          totalUsedMargin += lot * marginPerLot;
+        }
+      });
 
 
   // =============================
   // CALCULATE NEXT TRADE
   // =============================
 
-  if(!pairCounts[nextPair]) pairCounts[nextPair] = 0;
+      if(!pairCounts[nextPair]) pairCounts[nextPair] = 0;
 
-  const nextSequence = pairCounts[nextPair];
-  const nextMultiplier = pairMultipliers[nextPair];
+      const nextSequence = pairCounts[nextPair];
+      const nextMultiplier = pairMultipliers[nextPair];
 
-  const nextLotRaw = baseLot * Math.pow(nextMultiplier, nextSequence);
-  const nextLot = Math.floor(nextLotRaw * 100) / 100;
+      const nextLotRaw = baseLot * Math.pow(nextMultiplier, nextSequence);
+      const nextLot = Math.floor(nextLotRaw * 100) / 100;
 
-  const addedMargin = nextLot * marginPerLot;
+      const addedMargin = nextLot * marginPerLot;
 
-  const newUsedMargin = totalUsedMargin + addedMargin;
-  const nextMarginLevel = (balance / newUsedMargin) * 100;
+      const newUsedMargin = totalUsedMargin + addedMargin;
+      const nextMarginLevel = (balance / newUsedMargin) * 100;
 
   // =============================
   // TRADES UNTIL 100% MARGIN
   // =============================
 
-  let collapseCount = 0;
+      let collapseCount = 0;
   let collapseMargin = newUsedMargin;   // start AFTER next trade
   let collapseSequence = nextSequence + 1; // start AFTER next trade
 
@@ -610,14 +689,14 @@ function simulateNextTrade(){
   nextMargin.textContent = Math.round(nextMarginLevel) + "%";
 
   nextDot.className =
-    "dot " +
-    (nextMarginLevel >= 500 ? "green" :
-     nextMarginLevel >= 100 ? "yellow" : "red");
+  "dot " +
+  (nextMarginLevel >= 500 ? "green" :
+   nextMarginLevel >= 100 ? "yellow" : "red");
 
   nextLabel.textContent =
-    nextMarginLevel >= 500 ? "Green zone" :
-    nextMarginLevel >= 100 ? "Yellow zone" :
-    "Red zone";
+  nextMarginLevel >= 500 ? "Green zone" :
+  nextMarginLevel >= 100 ? "Yellow zone" :
+  "Red zone";
 
   nextExplain.textContent =
   `Risk: ${profile} | Base lot: ${baseLot.toFixed(2)} | Next lot (${nextPair}): ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)} | Estimated additional trades in ${nextPair} to 100%: ${collapseCount}`;
@@ -647,22 +726,22 @@ function simulateNextTrade(){
     const marginLevel = (balance / runningMargin) * 100;
 
     const zone =
-      marginLevel >= 500 ? "Green" :
-      marginLevel >= 100 ? "Yellow" :
-      "Red";
+    marginLevel >= 500 ? "Green" :
+    marginLevel >= 100 ? "Yellow" :
+    "Red";
 
     const color =
-      marginLevel >= 500 ? "var(--good)" :
-      marginLevel >= 100 ? "var(--warn)" :
-      "var(--bad)";
+    marginLevel >= 500 ? "var(--good)" :
+    marginLevel >= 100 ? "var(--warn)" :
+    "var(--bad)";
 
     ladderHTML += `
-      <div class="ladderRow">
-        <span>Trade ${i + 1} (${nextPair})</span>
-        <span class="ladderZone" style="color:${color}">
-          ${Math.round(marginLevel)}% (${zone})
-        </span>
-      </div>
+    <div class="ladderRow">
+    <span>Trade ${i + 1} (${nextPair})</span>
+    <span class="ladderZone" style="color:${color}">
+    ${Math.round(marginLevel)}% (${zone})
+    </span>
+    </div>
     `;
 
     forwardPairCounts[nextPair]++;
@@ -681,9 +760,9 @@ function simulateNextTrade(){
 
   bar.style.width = widthPercent + "%";
   bar.style.background =
-    nextMarginLevel >= 500 ? "var(--good)" :
-    nextMarginLevel >= 100 ? "var(--warn)" :
-    "var(--bad)";
+  nextMarginLevel >= 500 ? "var(--good)" :
+  nextMarginLevel >= 100 ? "var(--warn)" :
+  "var(--bad)";
 }
 
 const pairs = [
@@ -697,45 +776,50 @@ const pairs = [
   "EURCAD",
   "EURNZD",
   "USDCAD"
-];
+  ];
 
 const pairTable = document.getElementById("pairTable");
 
 // Generate table
 pairTable.innerHTML = `
-  <div class="pairGrid">
-    ${pairs.map(pair => `
-      <div class="pairItem">
-        <span class="pairLabel">${pair}</span>
-        <input 
-          type="number" 
-          min="0" 
-          value="0" 
-          class="pairCount"
-          data-pair="${pair}"
-        >
-      </div>
-    `).join("")}
+<div class="pairGrid">
+${pairs.map(pair => `
+  <div class="pairItem">
+  <span class="pairLabel">${pair}</span>
+  <input 
+  type="number" 
+  min="0" 
+  value="0" 
+  class="pairCount"
+  data-pair="${pair}"
+  >
   </div>
+  `).join("")}
+</div>
 `;
 
 // Balance input
 document.getElementById("balance")
-  .addEventListener("input", simulateNextTrade);
+.addEventListener("input", simulateNextTrade);
 
 // Risk profile dropdown
 document.getElementById("riskProfile")
-  .addEventListener("change", simulateNextTrade);
+.addEventListener("change", simulateNextTrade);
 
 // Next pair dropdown
 document.getElementById("nextPair")
-  .addEventListener("change", simulateNextTrade);
+.addEventListener("change", simulateNextTrade);
 
 // Pair trade counters (generated dynamically)
 document.querySelectorAll(".pairCount")
-  .forEach(input => {
-    input.addEventListener("input", simulateNextTrade);
-  });
+.forEach(input => {
+  input.addEventListener("input", simulateNextTrade);
+});
+
+function toggleHelp(id){
+  const el = document.getElementById(id);
+  el.classList.toggle("open");
+}
 
 </script>
 
