@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Margin Level Guide & Calculator</title>
+  <title>Delorean Margin Level Guide, by Cypher</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -272,7 +272,7 @@
 
     <div class="topbar">
       <div>
-        <h1>Margin Level Guide</h1>
+        <h1>Delorean Margin Level Guide, by Cypher</h1>
         <p class="subtitle">
           As the algorithm opens trades, margin will fall. This is normal. What matters is which zone your margin is in and what (if anything) you should do.
         </p>
@@ -451,35 +451,6 @@
           </p>
         </div>
 
-        <div class="hr"></div>
-
-        <div class="sectionTitle">Forward Risk Projection</div>
-        <h2>Next 10 Trade Outlook</h2>
-        <p class="explain"> These will be the margin values if the algorithm decides to open the next 10 trades in your chosen trading pair. </p>
-
-        <div id="ladderContainer" class="result">
-          <div id="ladderList">
-            <div class="ladderRow">
-              <span>Trade —</span>
-              <span class="ladderZone" style="color:var(--muted)">
-                0% (Awaiting input)
-              </span>
-            </div>
-          </div>
-
-
-          <div style="margin-top:14px">
-            <div style="font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:rgba(154,170,199,.9); margin-bottom:6px;">
-              Next Trade Margin Bar
-            </div>
-            <div style="height:14px; border-radius:10px; background:#0B1220; border:1px solid var(--line); overflow:hidden;">
-              <div id="marginBarFill" style="height:100%; width:0%; background:var(--line); transition:all .4s ease;"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="hr"></div>
-
         <footer>
           Educational tool only. Broker margin and liquidation rules vary.
         </footer>
@@ -543,23 +514,6 @@
       "Current equity already supports this margin.";
     }
 
-    function simulate(){
-      const e=num(equity.value);
-      const u=num(usedMargin.value);
-      const l=+leverage.value;
-      const a=+adverseMove.value;
-      if(!(e&&u))return;
-      const loss=e*l*(a/100);
-      const ne=Math.max(0,e-loss);
-      const m=(ne/u)*100;
-
-      simResult.style.display="block";
-      simEquity.textContent="$"+Math.round(ne);
-      simDot.className="dot "+(m>=500?"green":m>=100?"yellow":"red");
-      simLabel.textContent=m>=500?"Green":m>=100?"Yellow":"Red";
-      simExplain.textContent=`Projected margin: ${Math.round(m)}%.`;
-    }
-
     const pairMultipliers = {
       EURUSD: 1.6,
       AUDUSD: 1.6,
@@ -600,16 +554,6 @@
         nextLabel.textContent = "Balance too small";
         nextExplain.textContent =
         `Minimum required for ${profile} profile: $${divisor}`;
-
-    // Reset ladder + margin bar
-        ladderList.innerHTML = `
-        <div class="ladderRow">
-        <span>Trade —</span>
-        <span class="ladderZone" style="color:var(--muted)">
-        Inactive (Balance too small)
-        </span>
-        </div>
-        `;
 
         const bar = document.getElementById("marginBarFill");
         bar.style.width = "0%";
@@ -661,6 +605,8 @@
       const addedMargin = nextLot * marginPerLot;
 
       const newUsedMargin = totalUsedMargin + addedMargin;
+      if (newUsedMargin <= 0) return;
+
       const nextMarginLevel = (balance / newUsedMargin) * 100;
 
   // =============================
@@ -700,54 +646,6 @@
 
   nextExplain.textContent =
   `Risk: ${profile} | Base lot: ${baseLot.toFixed(2)} | Next lot (${nextPair}): ${nextLot.toFixed(2)} | Added margin: $${Math.round(addedMargin)} | Estimated additional trades in ${nextPair} to 100%: ${collapseCount}`;
-
-
-  // =============================
-  // FORWARD 10-TRADE PROJECTION
-  // =============================
-
-  let ladderHTML = "";
-  let runningMargin = totalUsedMargin;
-
-  // Clone pairCounts so we don’t mutate original
-  let forwardPairCounts = {...pairCounts};
-
-  for(let i = 0; i < 10; i++){
-
-    if(!forwardPairCounts[nextPair]) forwardPairCounts[nextPair] = 0;
-
-    const sequence = forwardPairCounts[nextPair];
-    const lotRaw = baseLot * Math.pow(nextMultiplier, sequence);
-    const lot = Math.floor(lotRaw * 100) / 100;
-
-    const tradeMargin = lot * marginPerLot;
-    runningMargin += tradeMargin;
-
-    const marginLevel = (balance / runningMargin) * 100;
-
-    const zone =
-    marginLevel >= 500 ? "Green" :
-    marginLevel >= 100 ? "Yellow" :
-    "Red";
-
-    const color =
-    marginLevel >= 500 ? "var(--good)" :
-    marginLevel >= 100 ? "var(--warn)" :
-    "var(--bad)";
-
-    ladderHTML += `
-    <div class="ladderRow">
-    <span>Trade ${i + 1} (${nextPair})</span>
-    <span class="ladderZone" style="color:${color}">
-    ${Math.round(marginLevel)}% (${zone})
-    </span>
-    </div>
-    `;
-
-    forwardPairCounts[nextPair]++;
-  }
-
-  ladderList.innerHTML = ladderHTML;
 
 
   // =============================
